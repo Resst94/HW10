@@ -8,73 +8,52 @@ class Field:
         return str(self.value)
 
 class Name(Field):
-    def __init__(self, name):
-        super().__init__(name)
-        self.name = self.valid_name(name)
+    """class for validate name field"""
 
-    def valid_name(self, name: str):
-        if len(name) < 3:
-            print("Name at least 3 characters")
-            return ''
-        if not name.isalpha():
-            print("The name must consist of letters only")
-            return ''
-        return name
+    def __init__(self, value):
+        if len(value) < 1 or not value.isalpha():
+            raise ValueError("Name must be at least one character long")
+        super().__init__(value)
 
 class Phone(Field):
-    def __init__(self, phone: str):
-        super().__init__(phone)
-        self.phone = self.valid_phone(phone)
+    """class for validate phone field"""
 
-    def valid_phone(self, phone: str):
-        if len(phone) != 10:
-            print("The number is not 10 characters long")
-            raise ValueError
-        if not phone.isdigit():
-            print("The number must consist only of digits")
-            raise ValueError
-        return phone
-
-    def add_to_record(self, record):
-        record.phones.append(self)
+    def __init__(self, value):
+        if len(value) != 10 or not value.isdigit():
+            raise ValueError("Phone number must be 10 digits")
+        super().__init__(value)
 
 class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
 
-
     def add_phone(self, phone):
-        tel = Phone(phone)
-        if tel.valid_phone(phone):
-            tel.add_to_record(self)
-            self.phones.append(tel)
+        self.phones.append(Phone(phone))
+        str(f'Number phone {phone} has been add')
 
     def remove_phone(self, phone):
         tel = Phone(phone)
         for item in self.phones:
-            if tel.phone == item.phone:
+            if tel.value == item.value:
                 self.phones.remove(item)
 
     def edit_phone(self, phone_old, phone_new):
         tel_new = Phone(phone_new)
         for item in self.phones:
-            if phone_old == item.phone:
+            if phone_old == item.value:
                 idx = self.phones.index(item)
                 self.phones.remove(item)
                 self.phones.insert(idx, tel_new)
                 return
-            else:
-                print("Number not found")
-                raise ValueError
+        print("Number not found")
+        raise ValueError
 
     def find_phone(self, phone):
         tel = Phone(phone)
         for item in self.phones:
-            if tel.phone == item.phone:
+            if tel.value == item.value:
                 return item
-
-
 
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
@@ -98,10 +77,7 @@ class AddressBook(UserDict):
         else:
             print(f'{name} not found')
 
-
-
 def main():
-
     # Створення нової адресної книги
     book = AddressBook()
 
@@ -135,102 +111,5 @@ def main():
     # Видалення запису Jane
     book.delete("Jane")
 
-
 if __name__ == '__main__':
     main()
-    from collections import UserDict
-
-class Field:
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return str(self.value)
-
-class Name(Field):
-    def __init__(self, name):
-        super().__init__(name)
-        self.name = self.valid_name(name)
-
-    def valid_name(self, name: str):
-        if len(name) < 3:
-            print("Name at least 3 characters")
-            return ''
-        if not name.isalpha():
-            print("The name must consist of letters only")
-            return ''
-        return name
-
-class Phone(Field):
-    def __init__(self, phone: str):
-        super().__init__(phone)
-        self.phone = self.valid_phone(phone)
-
-    def valid_phone(self, phone: str):
-        if len(phone) != 10:
-            print("The number is not 10 characters long")
-            raise ValueError
-        if not phone.isdigit():
-            print("The number must consist only of digits")
-            raise ValueError
-        return phone
-
-    def add_to_record(self, record):
-        record.phones.append(self)
-
-class Record:
-    def __init__(self, name):
-        self.name = Name(name)
-        self.phones = []
-
-    def add_phone(self, phone):
-        tel = Phone(phone)
-        tel.add_to_record(self)
-
-    def remove_phone(self, phone):
-        tel = Phone(phone)
-        for item in self.phones:
-            if tel.phone == item.phone:
-                self.phones.remove(item)
-
-    def edit_phone(self, phone_old, phone_new):
-        tel_new = Phone(phone_new)
-        for item in self.phones:
-            if phone_old == item.phone:
-                idx = self.phones.index(item)
-                self.phones.remove(item)
-                self.phones.insert(idx, tel_new)
-                return
-        print("Number not found")
-        raise ValueError
-
-    def find_phone(self, phone):
-        tel = Phone(phone)
-        for item in self.phones:
-            if tel.phone == item.phone:
-                return item
-
-    def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
-
-class AddressBook(UserDict):
-    def __init__(self):
-        self.data = dict()
-
-    def add_record(self, obj):
-        self.data[str(obj.name)] = obj
-        print(f"Key {obj.name} with value {obj.phones} added")
-
-    def find(self, name):
-        if name in self.data:
-            result = self.data[name]
-            return result
-        else:
-            print(f'{name} not found')
-
-    def delete(self, name):
-        if name in self.data:
-            del self.data[name]
-            print(f'{name} deleted')
-        else:
-            print(f'{name} not found')
